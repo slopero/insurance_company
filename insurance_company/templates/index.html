@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Главная</title>
+</head>
+<body>
+    <h1>Добавить пользователя</h1>
+
+    <label>Имя пользователя:</label>
+    <input type="text" id="username" required>  <!-- Добавил id -->
+    <label>Пароль:</label>
+    <input type="password" id="password" required>  <!-- Добавил id -->
+
+    <button type="button" onclick="saveUser()">Сохранить</button>  <!-- Добавил type="button" -->
+
+    <h2>Список пользователей</h2>
+    <button type="button" onclick="loadUsers()">Загрузить пользователей</button>
+    <div id="users"></div>
+
+    <script>
+        function saveUser() {
+            console.log('saveUser запущена');  // Для отладки
+            
+            fetch('/api/users/save/', {
+                method: 'POST',
+                headers: {  // Было ( вместо {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,  // Было getElentById (опечатка)
+                    password: document.getElementById('password').value   // Было getElentById (опечатка)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Ответ:', data);
+                alert('Пользователь сохранен с ID: ' + data.id);
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка при сохранении!');
+            });
+        }
+
+        function loadUsers() {
+            console.log('loadUsers запущена');  // Для отладки
+            
+            fetch('/api/users/')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Данные:', data);
+                let html = '<ul>';
+                data.users.forEach(user => {
+                    html += `<li>${user.username}, ${user.password_hash}</li>`;
+                });
+                html += '</ul>';
+                document.getElementById('users').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка при загрузке!');
+            });
+        }
+    </script>
+</body>
+</html>

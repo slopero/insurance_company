@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .register-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .message.error {
+            background: #ffe6e6;
+            color: #d63031;
+            display: block;
+        }
+        .message.success {
+            background: #e6ffe6;
+            color: #00b894;
+            display: block;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h1>📝 Регистрация</h1>
+        
+        <div class="form-group">
+            <label for="username">Логин</label>
+            <input type="text" id="username" placeholder="Введите логин" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" placeholder="Введите пароль" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="confirm_password">Подтвердите пароль</label>
+            <input type="password" id="confirm_password" placeholder="Повторите пароль" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="ser_pass">Серия паспорта</label>
+            <input type="text" id="ser_pass" placeholder="Введите серию паспорта (4 цифры)" maxlength="4" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="num_pass">Номер паспорта</label>
+            <input type="text" id="num_pass" placeholder="Введите номер паспорта (6 цифр)" maxlength="6" required>
+        </div>
+        
+        <button type="button" onclick="register()">Зарегистрироваться</button>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="login-link">
+            <p>Уже есть аккаунт? <a href="/login/">Войти</a></p>
+        </div>
+    </div>
+
+    <script>
+        function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const serPass = document.getElementById('ser_pass').value;
+            const numPass = document.getElementById('num_pass').value;
+            const messageDiv = document.getElementById('message');
+            
+            if (!username || !password || !confirmPassword || !serPass || !numPass) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Заполните все поля!';
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Пароли не совпадают!';
+                return;
+            }
+            
+            if (password.length < 4) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Пароль должен быть не менее 4 символов!';
+                return;
+            }
+            
+            if (serPass.length !== 4 || !/^\d+$/.test(serPass)) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Серия паспорта должна состоять из 4 цифр!';
+                return;
+            }
+            
+            if (numPass.length !== 6 || !/^\d+$/.test(numPass)) {
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Номер паспорта должен состоять из 6 цифр!';
+                return;
+            }
+            
+            fetch('/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    ser_pass: serPass,
+                    num_pass: numPass
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = data.message + ' Перенаправление на вход...';
+                    setTimeout(() => {
+                        window.location.href = '/login/';
+                    }, 2000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Ошибка соединения с сервером';
+            });
+        }
+        
+        // Регистрация по Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                register();
+            }
+        });
+    </script>
+</body>
+</html>
