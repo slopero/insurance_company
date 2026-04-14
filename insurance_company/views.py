@@ -17,7 +17,7 @@ def login_view(request):
     """Страница входа"""
     if request.method == 'POST':
         data = json.loads(request.body)
-        login = data.get('username')  # поле в форме остается username
+        login = data.get('username')  
         password = data.get('password')
         
         try:
