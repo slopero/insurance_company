@@ -4,7 +4,7 @@ services:
   myapp:
     build: .
     image: ins_comp
-    expose:
+    ports:
      - "8000:8000"
 
    
